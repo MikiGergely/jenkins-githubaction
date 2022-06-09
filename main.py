@@ -19,13 +19,16 @@ def main():
     api_token = os.environ.get("INPUT_API_TOKEN")
     parameters = os.environ.get("INPUT_PARAMETERS")
     cookies = os.environ.get("INPUT_COOKIES")
-    wait = bool(os.environ.get("INPUT_WAIT"))
     timeout = int(os.environ.get("INPUT_TIMEOUT"))
     start_timeout = int(os.environ.get("INPUT_START_TIMEOUT"))
     interval = int(os.environ.get("INPUT_INTERVAL"))
     access_token = os.environ.get("INPUT_ACCESS_TOKEN")
     display_job_name = os.environ.get("INPUT_DISPLAY_JOB_NAME")
-        
+
+    # Predefined
+    job_query_timeout = 60
+    job_query_interval = 5
+
     if username and api_token:
         auth = (username, api_token)
     else:
@@ -75,7 +78,7 @@ def main():
     build_url = build.url
     if access_token:
         issue_comment(f'{display_job_name} - Build started [here]({build_url})')
-        
+
     logging.info(f"Build URL: {build_url}")
     print(f"::set-output name=build_url::{build_url}")
     print(f"::notice title=build_url::{build_url}")
@@ -89,10 +92,21 @@ def main():
         return
 
     body = f'### [{display_job_name} - Build]({build_url}) status returned **{result}**.'
-    try:
-        body+='\n{display_job_name} - Build ran _{build_time} ms_'.format(display_job_name=display_job_name, build_time=build.api_json()["duration"])
-    except e:
-        logging.info(f"Build duration unknown:\n{e}")
+    t0=time()
+    while time() - t0 < job_query_timeout:
+        try:
+            duration=build.api_json()["duration"]
+            if duration != 0:
+                body+='\n{display_job_name} - Build ran _{build_time} ms_'.format(display_job_name=display_job_name, build_time=duration)
+                break
+        except e:
+            logging.info(f"Build duration unknown:\n{e}")
+        sleep(job_query_interval)
+    else:
+        logging.info("Error fetching build details")
+        body+="\nError fetching build details"
+        issue_comment(body)
+        raise Exception("Error fetching build details")
 
     test_reports=build.get_test_report()
     if build.get_test_report() is None:
@@ -104,13 +118,13 @@ def main():
         f=test_reports_json["failCount"],
         s=test_reports_json["skipCount"]
     )
-     
+
     try:
          joke = requests.get('https://api.chucknorris.io/jokes/random', timeout=1).json()["value"]
-         body+=f"\n\n>{joke}" 
+         body+=f"\n\n>{joke}"
     except e:
         logging.info(f"API cannot be called:\n{e}")
-        
+
     issue_comment(body)
 
     if result in ('FAILURE', 'ABORTED'):
