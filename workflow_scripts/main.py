@@ -88,7 +88,7 @@ def main():
         keep_logs(build, auth)
         issue_comment('<!-- {"keepLogs":[{"build":{"fullName":"{job_name}","number":{number}},"enabled":true}]} -->'.format(
             job_name=build.get_job().full_name,
-            number=build.api_json()['number']
+            number=build.api_json()["number"]
         ))
 
     if not access_token:
