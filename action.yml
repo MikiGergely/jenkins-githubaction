@@ -49,4 +49,4 @@ runs:
   using: "docker"
   image: "Dockerfile"
   args:
-    - ${{ github_action }}
+    - ${{ inputs.github_action }}
