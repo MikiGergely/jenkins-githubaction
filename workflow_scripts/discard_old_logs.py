@@ -70,6 +70,7 @@ def find_old_logs():
 
     logging.info("searching for old logs")
     i=comments.totalCount
+    logging.info(f"Found {i} comments")
     j=0
     while i > 0:
         for comment in comments.get_page(j):
