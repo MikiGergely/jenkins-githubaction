@@ -86,7 +86,10 @@ def main():
     result=wait_for_build(build,timeout,interval)
     if access_token:
         keep_logs(build, auth)
-        issue_comment('<!-- {"keepLogs":[{"build":{"fullName":"{job_name}","number":{number}},"enabled":true}]} -->')
+        issue_comment('<!-- {"keepLogs":[{"build":{"fullName":"{job_name}","number":{number}},"enabled":true}]} -->'.format(
+            job_name=build.get_job().full_name,
+            number=build.api_json()['number']
+        ))
 
     if not access_token:
         logging.info("No comment.")
