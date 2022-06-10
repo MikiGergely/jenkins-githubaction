@@ -68,7 +68,7 @@ def find_old_logs():
 
     pr_repo_name = github_event["pull_request"]["base"]["repo"]["full_name"]
     pr_number = github_event["number"]
-    comments = github.get_repo(pr_repo_name).get_pull(pr_number).get_review_comments()
+    comments = github.get_repo(pr_repo_name).get_pull(pr_number).as_issue().get_comments()
 
     logging.info("searching for old logs")
     i=comments.totalCount
