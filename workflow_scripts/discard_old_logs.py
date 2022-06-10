@@ -77,24 +77,20 @@ def find_old_logs():
     while i > 0:
         for comment in comments.get_page(j):
             i-=1
-            if comment.user == github.get_user():
-                logging.info("I wrote:\n{c}".format(c=comment.body))
-                for data in re.findall('<!--(.*)-->', comment.body):
-                    try:
-                        json_data = json.loads(data)
-                    except json.decoder.JSONDecodeError as e:
-                        logging.debug(f"{data}\nNot valid json:\n{e} ")
-                    else:
-                        if "keepLogs" in json_data.keys():
-                            for log_data in json_data['keepLogs']:
-                                if log_data["enabled"]:
-                                    old_logs.add(log_data["build"])
-                                    logging.info("adding {b} to list".format(b=log_data["build"]))
-                                else:
-                                    old_logs.discard(log_data["build"])
-                                    logging.info("removing {b} from list".format(b=log_data["build"]))
-            else:
-                logging.info("I am {me}, the comment was left by {you}".format(me=github.get_user(), you=comment.user))
+            for data in re.findall('<!--(.*)-->', comment.body):
+                try:
+                    json_data = json.loads(data)
+                except json.decoder.JSONDecodeError as e:
+                    logging.debug(f"{data}\nNot valid json:\n{e} ")
+                else:
+                    if "keepLogs" in json_data.keys():
+                        for log_data in json_data['keepLogs']:
+                            if log_data["enabled"]:
+                                old_logs.add(log_data["build"])
+                                logging.info("adding {b} to list".format(b=log_data["build"]))
+                            else:
+                                old_logs.discard(log_data["build"])
+                                logging.info("removing {b} from list".format(b=log_data["build"]))
         j+=1
     return old_logs
 
