@@ -68,11 +68,13 @@ def find_old_logs():
     pr_number = github_event["number"]
     comments = github.get_repo(pr_repo_name).get_pull(pr_number).get_comments()
 
+    logging.info("searching for old logs")
     i=comments.totalCount
     j=0
     while i > 0:
         for comment in comments.get_page(j):
             i-=1
+            logging.info(f"commentFound:\n{comment}")
             if comment.user == github.get_user():
                 for data in re.findall('<!--(.*)-->', comment.body):
                     try:
