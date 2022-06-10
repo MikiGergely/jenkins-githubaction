@@ -1,1 +1,2 @@
-/usr/bin/env python3 "/app/$1"
+#!/bin/sh
+python3 "/app/$1"
