@@ -93,6 +93,8 @@ def find_old_logs():
                                 else:
                                     old_logs.discard(log_data["build"])
                                     logging.info("removing {b} from list".format(b=log_data["build"]))
+            else:
+                logging.info("I am {me}, the comment was left by {you}".format(me=github.get_user(), you=comment.user))
         j+=1
     return old_logs
 
