@@ -84,6 +84,7 @@ def main():
     print(f"::notice title=build_url::{build_url}")
 
     result=wait_for_build(build,timeout,interval)
+    keep_logs(build, auth)
 
     if not access_token:
         logging.info("No comment.")
@@ -120,8 +121,8 @@ def main():
     )
 
     try:
-         joke = requests.get('https://api.chucknorris.io/jokes/random', timeout=1).json()["value"]
-         body+=f"\n\n>{joke}"
+        joke = requests.get('https://api.chucknorris.io/jokes/random', timeout=1).json()["value"]
+        body+=f"\n\n>{joke}"
     except e:
         logging.info(f"API cannot be called:\n{e}")
 
@@ -130,6 +131,13 @@ def main():
     if result in ('FAILURE', 'ABORTED'):
         raise Exception(result)
 
+
+def keep_logs(build, auth, enabled=True):
+    if build.api_json()['keepLog'] == enabled:
+        return
+    response = requests.post(url=build.url+"toggleLogKeep", auth=auth)
+    if not response.ok:
+        raise Exception(f"Post request returned {response.status_code}")
 
 def wait_for_build(build,timeout,interval):
     build_url=build.url

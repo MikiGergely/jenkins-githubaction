@@ -2,6 +2,9 @@ name: "Jenkins-Action"
 description: "Start Jenkins jobs and report back url and status of build"
 author: "Josh Levy-Kramer"
 inputs:
+  github_action:
+    description: "python script to run, e.g.: main.py (jenkins-githubaction/workflow_scripts/github_action"
+    required: true
   url:
     description: "Jenkins URL including http/https protocol"
     required: true
@@ -27,10 +30,6 @@ inputs:
   cookies:
     description: 'Cookies to include in HTTP requests in JSON format e.g. `{"field1":"value1"}`'
     required: false
-  wait:
-    description: "Should the runner wait for the build to finish and provide ok status"
-    required: false
-    default: "True"
   timeout:
     description: "Timeout in seconds for build to complete"
     required: false
@@ -49,3 +48,5 @@ outputs:
 runs:
   using: "docker"
   image: "Dockerfile"
+  args:
+    - ${{ github_action }}
