@@ -47,11 +47,15 @@ def main():
         raise Exception('Could not connect to Jenkins.') from e
 
     logging.info('Successfully connected to Jenkins.')
+    log_keep_meta={
+        "keepLogs" : []
+    }
     for log in find_old_logs():
         logging.debug(log)
         build = jenkins.get_job(log["fullName"]).get_build(log["number"])
         keep_logs(build, auth, False)
-
+        log_keep_meta["keepLogs"].append({"build": {"fullName": log["fullName"], "number": log["number"]}, "enabled": False})
+    issue_comment("<!--{lkm}-->\n_Discarded old logs_".format(lkm=json.dumps(log_keep_meta)))
 
 
 
