@@ -19,6 +19,8 @@ def main():
     api_token = os.environ.get("INPUT_API_TOKEN")
     cookies = os.environ.get("INPUT_COOKIES")
     access_token = os.environ.get("INPUT_ACCESS_TOKEN")
+    if not access_token:
+        raise Exception("Access token is required to connect to github")
 
     # Predefined
 
@@ -66,7 +68,7 @@ def find_old_logs():
 
     pr_repo_name = github_event["pull_request"]["base"]["repo"]["full_name"]
     pr_number = github_event["number"]
-    comments = github.get_repo(pr_repo_name).get_pull(pr_number).get_comments()
+    comments = github.get_repo(pr_repo_name).get_pull(pr_number).get_review_comments()
 
     logging.info("searching for old logs")
     i=comments.totalCount
