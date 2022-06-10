@@ -57,7 +57,7 @@ def main():
 
 
 def find_old_logs():
-    #Comment example: <!-- {"keepLogs":[{"build": {"fullName": "utils/test", "number": 5}, "enabled": true }]} -->
+    #Comment example: '<!-- {"keepLogs":[{"build": {"fullName": "utils/test", "number": 5}, "enabled": true }]} -->'
     old_logs={}
 
     github = Github(os.environ.get("INPUT_ACCESS_TOKEN"))
@@ -77,8 +77,8 @@ def find_old_logs():
     while i > 0:
         for comment in comments.get_page(j):
             i-=1
-            logging.info(f"commentFound:\n{comment}")
             if comment.user == github.get_user():
+                logging.info("I wrote:\n{c}".format(c=comment.body))
                 for data in re.findall('<!--(.*)-->', comment.body):
                     try:
                         json_data = json.loads(data)
@@ -89,8 +89,10 @@ def find_old_logs():
                             for log_data in json_data['keepLogs']:
                                 if log_data["enabled"]:
                                     old_logs.add(log_data["build"])
+                                    logging.info("adding {b} to list".format(b=log_data["build"]))
                                 else:
                                     old_logs.discard(log_data["build"])
+                                    logging.info("removing {b} from list".format(b=log_data["build"]))
         j+=1
     return old_logs
 
