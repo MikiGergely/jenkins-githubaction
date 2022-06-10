@@ -84,7 +84,9 @@ def main():
     print(f"::notice title=build_url::{build_url}")
 
     result=wait_for_build(build,timeout,interval)
-    keep_logs(build, auth)
+    if access_token:
+        keep_logs(build, auth)
+        issue_comment('<!-- {"keepLogs":[{"build":{"fullName":"{job_name}","number":{number}},"enabled":true}]} -->')
 
     if not access_token:
         logging.info("No comment.")
