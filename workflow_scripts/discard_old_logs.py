@@ -62,7 +62,7 @@ def main():
 
 def find_old_logs():
     #Comment example: '<!-- {"keepLogs":[{"build": {"fullName": "utils/test", "number": 5}, "enabled": true }]} -->'
-    old_logs={}
+    old_logs=set()
 
     github = Github(os.environ.get("INPUT_ACCESS_TOKEN"))
 
